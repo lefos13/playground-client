@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  redisserver:
+    image: hub.swarmlab.io:5480/playground-redisserver:latest
+    deploy:
+      mode: replicated
+      restart_policy:
+        delay: 10s
+        #max_attempts: 10
+        window: 60s
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.id==${noderead}
+    ports:
+      - "6379:6379"
+    networks:
+      playground-net:
+  readmongo:
+    image: nodejs-test-app:latest
+    deploy:
+      mode: replicated
+      restart_policy:
+        delay: 10s
+        #max_attempts: 10
+        window: 60s
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.id==${noderead}
+    ports:
+      - "3000:3000"
+    networks:
+      playground-net:
+  client:
+    image: playground-client
+    deploy:
+      mode: replicated
+      restart_policy:
+        delay: 10s
+        #max_attempts: 10
+        window: 60s
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.id==${noderead}
+    ports:
+      - "8080:8080"
+    networks:
+      playground-net:
+
+networks:
+  playground-net:
